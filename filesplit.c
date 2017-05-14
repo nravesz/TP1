@@ -15,19 +15,30 @@ int main(int argc, char* argv[]){
 		fprintf(stderr, "ERROR: Ha habido un problema con el archivo \"%s\"!\n", argv[1]);
 		return 0;
 	}
-	int i = 0;
+	int contador  = 0;
 	int n_archivo = 1;
 	while (!feof(archivo)){
 		char* nombre = generar_nombre(argv, n_archivo);
 		FILE* nuevo = fopen(nombre,"w");
-		while(i != cant_caracter || !feof(archivo)){
-			char caracter[1];
-			fgets(caracter, 1, archivo);
-			fwrite(&caracter, sizeof(char), 1, nuevo);
+		free(nombre);
+		int c;
+		while ((c = fgetc(archivo)) != EOF){
+			if (c == '\n'){
+				fputs(" ", nuevo);
+			}
+			else{
+				char buffer[1];
+				sprintf(buffer, "%c", c);
+				fputs(buffer, nuevo);
+			}
+			contador++;
+			if (contador > cant_caracter){
+				fputs("\0", nuevo);
+				contador = 0;
+				break;
+			}
 		}
-		fputc('\0', nuevo);
 		fclose(nuevo);
-		i = 0;
 		n_archivo++;
 	}
 	fclose(archivo);
